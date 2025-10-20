@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"cloud.google.com/go/pubsub"
+
 	"github.com/censys/scan-takehome/internal/handlers"
 	"github.com/censys/scan-takehome/internal/service"
 )

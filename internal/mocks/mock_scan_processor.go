@@ -36,7 +36,7 @@ func (m *MockScanProcessor) EXPECT() *MockScanProcessorMockRecorder {
 }
 
 // ProcessScanResult mocks base method.
-func (m *MockScanProcessor) ProcessScanResult(ctx context.Context, scanResult domain.ScanResult) error {
+func (m *MockScanProcessor) ProcessScanResult(ctx context.Context, scanResult *domain.ScanResult) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessScanResult", ctx, scanResult)
 	ret0, _ := ret[0].(error)

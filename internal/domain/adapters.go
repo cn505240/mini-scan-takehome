@@ -25,14 +25,15 @@ func ConvertScanToDomain(rawScan scanning.Scan) (ScanResult, error) {
 func extractServiceResponse(rawScan scanning.Scan) (string, error) {
 	switch rawScan.DataVersion {
 	case scanning.V1:
-		if v1Data, ok := rawScan.Data.(*scanning.V1Data); ok {
-			decoded, err := base64.StdEncoding.DecodeString(string(v1Data.ResponseBytesUtf8))
+		switch data := rawScan.Data.(type) {
+		case *scanning.V1Data:
+			decoded, err := base64.StdEncoding.DecodeString(string(data.ResponseBytesUtf8))
 			if err != nil {
 				return "", err
 			}
 			return string(decoded), nil
-		} else if dataMap, ok := rawScan.Data.(map[string]interface{}); ok {
-			if responseBytes, ok := dataMap["response_bytes_utf8"].(string); ok {
+		case map[string]interface{}:
+			if responseBytes, ok := data["response_bytes_utf8"].(string); ok {
 				decoded, err := base64.StdEncoding.DecodeString(responseBytes)
 				if err != nil {
 					return "", err
@@ -41,10 +42,11 @@ func extractServiceResponse(rawScan scanning.Scan) (string, error) {
 			}
 		}
 	case scanning.V2:
-		if v2Data, ok := rawScan.Data.(*scanning.V2Data); ok {
-			return v2Data.ResponseStr, nil
-		} else if dataMap, ok := rawScan.Data.(map[string]interface{}); ok {
-			if responseStr, ok := dataMap["response_str"].(string); ok {
+		switch data := rawScan.Data.(type) {
+		case *scanning.V2Data:
+			return data.ResponseStr, nil
+		case map[string]interface{}:
+			if responseStr, ok := data["response_str"].(string); ok {
 				return responseStr, nil
 			}
 		}

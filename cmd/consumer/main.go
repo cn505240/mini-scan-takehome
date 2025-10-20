@@ -22,7 +22,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create scan worker: %v", err)
 	}
-	defer scanWorker.Stop()
+	defer func() {
+		if err := scanWorker.Stop(); err != nil {
+			log.Printf("Error stopping scan worker: %v", err)
+		}
+	}()
 
 	// Run the worker
 	if err := scanWorker.Run(); err != nil {

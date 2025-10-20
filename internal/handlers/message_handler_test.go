@@ -6,11 +6,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/censys/scan-takehome/internal/domain"
 	"github.com/censys/scan-takehome/internal/mocks"
 	"github.com/censys/scan-takehome/pkg/scanning"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestMessageHandler_HandleMessage_Success(t *testing.T) {

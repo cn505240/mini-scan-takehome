@@ -10,7 +10,7 @@ import (
 )
 
 type ScanProcessor interface {
-	ProcessScanResult(ctx context.Context, scanResult domain.ScanResult) error
+	ProcessScanResult(ctx context.Context, scanResult *domain.ScanResult) error
 }
 
 type MessageHandler struct {
@@ -36,5 +36,5 @@ func (mh *MessageHandler) HandleMessage(ctx context.Context, msgData []byte) err
 		return err
 	}
 
-	return mh.processor.ProcessScanResult(ctx, scanResult)
+	return mh.processor.ProcessScanResult(ctx, &scanResult)
 }
