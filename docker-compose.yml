@@ -48,8 +48,29 @@ services:
       context: .
       dockerfile: ./cmd/scanner/Dockerfile
 
+  migrate:
+    image: postgres:15
+    depends_on:
+      postgres:
+        condition: service_started
+    environment:
+      PGPASSWORD: postgres
+    command: >
+      sh -c "
+        until pg_isready -h postgres -p 5432 -U postgres; do
+          echo 'Waiting for postgres...'
+          sleep 2
+        done
+        psql -h postgres -p 5432 -U postgres -d scans -f /migrations/001_create_service_records.sql
+        echo 'Migrations completed'
+      "
+    volumes:
+      - ./internal/db/migrations:/migrations
+
   consumer:
     depends_on:
+      migrate:
+        condition: service_completed_successfully
       mk-subscription:
         condition: service_completed_successfully
     environment:

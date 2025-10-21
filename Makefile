@@ -1,4 +1,4 @@
-.PHONY: up down test mocks lint lint-fix migrate
+.PHONY: up down test mocks lint lint-fix
 
 up:
 	docker compose up -d
@@ -8,9 +8,6 @@ down:
 
 test:
 	go test ./...
-
-migrate:
-	PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d scans -f internal/db/migrations/001_create_service_records.sql
 
 mocks:
 	mockgen -source=internal/handlers/message_handler.go -destination=internal/mocks/mock_scan_processor.go -package=mocks
