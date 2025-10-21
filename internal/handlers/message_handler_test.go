@@ -37,28 +37,28 @@ func TestMessageHandler_HandleMessage_Success(t *testing.T) {
 		t.Fatalf("Failed to marshal scan: %v", err)
 	}
 
-	expectedScanResult := domain.ScanResult{
-		IP:        "192.168.1.1",
-		Port:      8080,
-		Service:   "HTTP",
-		Response:  "Hello World",
-		Timestamp: time.Unix(scan.Timestamp, 0),
+	expectedScanResult := domain.ServiceScan{
+		IP:          "192.168.1.1",
+		Port:        8080,
+		Service:     "HTTP",
+		Response:    "Hello World",
+		LastScanned: time.Unix(scan.Timestamp, 0),
 	}
 
 	mockProcessor.EXPECT().
 		ProcessScanResult(gomock.Any(), gomock.Any()).
-		Do(func(ctx context.Context, scanResult domain.ScanResult) {
-			if scanResult.IP != expectedScanResult.IP {
-				t.Errorf("Expected IP %s, got %s", expectedScanResult.IP, scanResult.IP)
+		Do(func(ctx context.Context, scan *domain.ServiceScan) {
+			if scan.IP != expectedScanResult.IP {
+				t.Errorf("Expected IP %s, got %s", expectedScanResult.IP, scan.IP)
 			}
-			if scanResult.Port != expectedScanResult.Port {
-				t.Errorf("Expected Port %d, got %d", expectedScanResult.Port, scanResult.Port)
+			if scan.Port != expectedScanResult.Port {
+				t.Errorf("Expected Port %d, got %d", expectedScanResult.Port, scan.Port)
 			}
-			if scanResult.Service != expectedScanResult.Service {
-				t.Errorf("Expected Service %s, got %s", expectedScanResult.Service, scanResult.Service)
+			if scan.Service != expectedScanResult.Service {
+				t.Errorf("Expected Service %s, got %s", expectedScanResult.Service, scan.Service)
 			}
-			if scanResult.Response != expectedScanResult.Response {
-				t.Errorf("Expected Response %s, got %s", expectedScanResult.Response, scanResult.Response)
+			if scan.Response != expectedScanResult.Response {
+				t.Errorf("Expected Response %s, got %s", expectedScanResult.Response, scan.Response)
 			}
 		}).
 		Return(nil)
@@ -89,18 +89,18 @@ func TestMessageHandler_HandleMessage_V1Data_Success(t *testing.T) {
 
 	mockProcessor.EXPECT().
 		ProcessScanResult(gomock.Any(), gomock.Any()).
-		Do(func(ctx context.Context, scanResult domain.ScanResult) {
-			if scanResult.IP != "10.0.0.1" {
-				t.Errorf("Expected IP 10.0.0.1, got %s", scanResult.IP)
+		Do(func(ctx context.Context, scan *domain.ServiceScan) {
+			if scan.IP != "10.0.0.1" {
+				t.Errorf("Expected IP 10.0.0.1, got %s", scan.IP)
 			}
-			if scanResult.Port != 22 {
-				t.Errorf("Expected Port 22, got %d", scanResult.Port)
+			if scan.Port != 22 {
+				t.Errorf("Expected Port 22, got %d", scan.Port)
 			}
-			if scanResult.Service != "SSH" {
-				t.Errorf("Expected Service SSH, got %s", scanResult.Service)
+			if scan.Service != "SSH" {
+				t.Errorf("Expected Service SSH, got %s", scan.Service)
 			}
-			if scanResult.Response != "SSH-2.0-OpenSSH_8.2" {
-				t.Errorf("Expected Response SSH-2.0-OpenSSH_8.2, got %s", scanResult.Response)
+			if scan.Response != "SSH-2.0-OpenSSH_8.2" {
+				t.Errorf("Expected Response SSH-2.0-OpenSSH_8.2, got %s", scan.Response)
 			}
 		}).
 		Return(nil)
@@ -182,9 +182,9 @@ func TestMessageHandler_HandleMessage_UnknownDataVersion(t *testing.T) {
 
 	mockProcessor.EXPECT().
 		ProcessScanResult(gomock.Any(), gomock.Any()).
-		Do(func(ctx context.Context, scanResult domain.ScanResult) {
-			if scanResult.Response != "" {
-				t.Errorf("Expected empty response for unknown data version, got %s", scanResult.Response)
+		Do(func(ctx context.Context, scan *domain.ServiceScan) {
+			if scan.Response != "" {
+				t.Errorf("Expected empty response for unknown data version, got %s", scan.Response)
 			}
 		}).
 		Return(nil)

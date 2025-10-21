@@ -1,4 +1,4 @@
-package consumer
+package workers
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"cloud.google.com/go/pubsub"
 
 	"github.com/censys/scan-takehome/internal/handlers"
-	"github.com/censys/scan-takehome/internal/service"
+	"github.com/censys/scan-takehome/internal/services"
 )
 
 type MessageHandler interface {
@@ -20,6 +20,7 @@ type MessageHandler interface {
 type Config struct {
 	ProjectID      string
 	SubscriptionID string
+	Repository     services.ScanRepository
 }
 
 type ScanWorker struct {
@@ -39,7 +40,7 @@ func NewScanWorker(config Config) (*ScanWorker, error) {
 
 	subscription := client.Subscription(config.SubscriptionID)
 
-	processor := service.NewScanProcessor()
+	processor := services.NewScanProcessor(config.Repository)
 	messageHandler := handlers.NewMessageHandler(processor)
 
 	return &ScanWorker{

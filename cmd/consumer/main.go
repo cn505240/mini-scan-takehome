@@ -1,26 +1,57 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
+	"fmt"
 	"log"
 
-	"github.com/censys/scan-takehome/internal/consumer"
+	_ "github.com/lib/pq"
+
+	"github.com/censys/scan-takehome/internal/repositories"
+	"github.com/censys/scan-takehome/internal/workers"
 )
 
 func main() {
 	projectId := flag.String("project", "test-project", "GCP Project ID")
 	subscriptionId := flag.String("subscription", "scan-sub", "GCP PubSub Subscription ID")
+	dbHost := flag.String("db-host", "localhost", "Database host")
+	dbPort := flag.String("db-port", "5432", "Database port")
+	dbName := flag.String("db-name", "scans", "Database name")
+	dbUser := flag.String("db-user", "postgres", "Database user")
+	dbPassword := flag.String("db-password", "password", "Database password")
 	flag.Parse()
 
-	// Create worker
-	config := consumer.Config{
-		ProjectID:      *projectId,
-		SubscriptionID: *subscriptionId,
+	if err := run(*projectId, *subscriptionId, *dbHost, *dbPort, *dbName, *dbUser, *dbPassword); err != nil {
+		log.Fatalf("Application error: %v", err)
+	}
+}
+
+func run(projectId, subscriptionId, dbHost, dbPort, dbName, dbUser, dbPassword string) error {
+	dbURL := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		dbHost, dbPort, dbUser, dbPassword, dbName)
+
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		return fmt.Errorf("failed to connect to database: %w", err)
+	}
+	defer db.Close()
+
+	if err := db.Ping(); err != nil {
+		return fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	scanWorker, err := consumer.NewScanWorker(config)
+	repo := repositories.NewPostgresRepository(db)
+
+	config := workers.Config{
+		ProjectID:      projectId,
+		SubscriptionID: subscriptionId,
+		Repository:     repo,
+	}
+
+	scanWorker, err := workers.NewScanWorker(config)
 	if err != nil {
-		log.Fatalf("Failed to create scan worker: %v", err)
+		return fmt.Errorf("failed to create scan worker: %w", err)
 	}
 	defer func() {
 		if err := scanWorker.Stop(); err != nil {
@@ -28,8 +59,9 @@ func main() {
 		}
 	}()
 
-	// Run the worker
 	if err := scanWorker.Run(); err != nil {
-		log.Printf("Worker error: %v", err)
+		return fmt.Errorf("worker error: %w", err)
 	}
+
+	return nil
 }

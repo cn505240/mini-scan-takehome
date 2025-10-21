@@ -7,18 +7,18 @@ import (
 	"github.com/censys/scan-takehome/pkg/scanning"
 )
 
-func ConvertScanToDomain(rawScan scanning.Scan) (ScanResult, error) {
+func ConvertScanToDomain(rawScan scanning.Scan) (ServiceScan, error) {
 	response, err := extractServiceResponse(rawScan)
 	if err != nil {
-		return ScanResult{}, err
+		return ServiceScan{}, err
 	}
 
-	return ScanResult{
-		IP:        rawScan.Ip,
-		Port:      rawScan.Port,
-		Service:   rawScan.Service,
-		Response:  response,
-		Timestamp: time.Unix(rawScan.Timestamp, 0),
+	return ServiceScan{
+		IP:          rawScan.Ip,
+		Port:        rawScan.Port,
+		Service:     rawScan.Service,
+		Response:    response,
+		LastScanned: time.Unix(rawScan.Timestamp, 0),
 	}, nil
 }
 

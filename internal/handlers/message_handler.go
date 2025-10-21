@@ -10,7 +10,7 @@ import (
 )
 
 type ScanProcessor interface {
-	ProcessScanResult(ctx context.Context, scanResult *domain.ScanResult) error
+	ProcessScanResult(ctx context.Context, scan *domain.ServiceScan) error
 }
 
 type MessageHandler struct {
@@ -30,11 +30,11 @@ func (mh *MessageHandler) HandleMessage(ctx context.Context, msgData []byte) err
 		return err
 	}
 
-	scanResult, err := domain.ConvertScanToDomain(rawScan)
+	scan, err := domain.ConvertScanToDomain(rawScan)
 	if err != nil {
 		log.Printf("Failed to convert message to domain model: %v", err)
 		return err
 	}
 
-	return mh.processor.ProcessScanResult(ctx, &scanResult)
+	return mh.processor.ProcessScanResult(ctx, &scan)
 }

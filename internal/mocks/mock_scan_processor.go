@@ -36,15 +36,15 @@ func (m *MockScanProcessor) EXPECT() *MockScanProcessorMockRecorder {
 }
 
 // ProcessScanResult mocks base method.
-func (m *MockScanProcessor) ProcessScanResult(ctx context.Context, scanResult *domain.ScanResult) error {
+func (m *MockScanProcessor) ProcessScanResult(ctx context.Context, scan *domain.ServiceScan) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ProcessScanResult", ctx, scanResult)
+	ret := m.ctrl.Call(m, "ProcessScanResult", ctx, scan)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // ProcessScanResult indicates an expected call of ProcessScanResult.
-func (mr *MockScanProcessorMockRecorder) ProcessScanResult(ctx, scanResult interface{}) *gomock.Call {
+func (mr *MockScanProcessorMockRecorder) ProcessScanResult(ctx, scan interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessScanResult", reflect.TypeOf((*MockScanProcessor)(nil).ProcessScanResult), ctx, scanResult)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessScanResult", reflect.TypeOf((*MockScanProcessor)(nil).ProcessScanResult), ctx, scan)
 }

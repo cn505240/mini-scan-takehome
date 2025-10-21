@@ -11,7 +11,8 @@ test:
 
 mocks:
 	mockgen -source=internal/handlers/message_handler.go -destination=internal/mocks/mock_scan_processor.go -package=mocks
-	mockgen -source=internal/consumer/scan_consumer.go -destination=internal/mocks/mock_message_handler.go -package=mocks
+	mockgen -source=internal/workers/scan_worker.go -destination=internal/mocks/mock_message_handler.go -package=mocks
+	mockgen -source=internal/services/scan_processor.go -destination=internal/mocks/mock_scan_repository.go -package=mocks
 
 lint:
 	golangci-lint run

@@ -28,7 +28,7 @@ func TestConvertScanToDomain_V2Data(t *testing.T) {
 	assert.Equal(t, uint32(8080), result.Port)
 	assert.Equal(t, "HTTP", result.Service)
 	assert.Equal(t, "Hello World", result.Response)
-	assert.Equal(t, time.Unix(1640995200, 0), result.Timestamp)
+	assert.Equal(t, time.Unix(1640995200, 0), result.LastScanned)
 }
 
 func TestConvertScanToDomain_V1Data(t *testing.T) {
@@ -50,7 +50,7 @@ func TestConvertScanToDomain_V1Data(t *testing.T) {
 	assert.Equal(t, uint32(22), result.Port)
 	assert.Equal(t, "SSH", result.Service)
 	assert.Equal(t, "SSH-2.0-OpenSSH_8.2", result.Response)
-	assert.Equal(t, time.Unix(1640995200, 0), result.Timestamp)
+	assert.Equal(t, time.Unix(1640995200, 0), result.LastScanned)
 }
 
 func TestConvertScanToDomain_V1DataFromJSON(t *testing.T) {
@@ -73,7 +73,7 @@ func TestConvertScanToDomain_V1DataFromJSON(t *testing.T) {
 	assert.Equal(t, uint32(22), result.Port)
 	assert.Equal(t, "SSH", result.Service)
 	assert.Equal(t, "SSH-2.0-OpenSSH_8.2", result.Response)
-	assert.Equal(t, time.Unix(1640995200, 0), result.Timestamp)
+	assert.Equal(t, time.Unix(1640995200, 0), result.LastScanned)
 }
 
 func TestConvertScanToDomain_V2DataFromJSON(t *testing.T) {
@@ -96,7 +96,7 @@ func TestConvertScanToDomain_V2DataFromJSON(t *testing.T) {
 	assert.Equal(t, uint32(8080), result.Port)
 	assert.Equal(t, "HTTP", result.Service)
 	assert.Equal(t, "Hello World", result.Response)
-	assert.Equal(t, time.Unix(1640995200, 0), result.Timestamp)
+	assert.Equal(t, time.Unix(1640995200, 0), result.LastScanned)
 }
 
 func TestConvertScanToDomain_UnknownDataVersion(t *testing.T) {
@@ -116,7 +116,7 @@ func TestConvertScanToDomain_UnknownDataVersion(t *testing.T) {
 	assert.Equal(t, uint32(8080), result.Port)
 	assert.Equal(t, "HTTP", result.Service)
 	assert.Equal(t, "", result.Response) // Empty response for unknown version
-	assert.Equal(t, time.Unix(1640995200, 0), result.Timestamp)
+	assert.Equal(t, time.Unix(1640995200, 0), result.LastScanned)
 }
 
 func TestConvertScanToDomain_InvalidBase64(t *testing.T) {
@@ -134,7 +134,7 @@ func TestConvertScanToDomain_InvalidBase64(t *testing.T) {
 	result, err := ConvertScanToDomain(rawScan)
 
 	assert.Error(t, err)
-	assert.Equal(t, ScanResult{}, result)
+	assert.Equal(t, ServiceScan{}, result)
 }
 
 func TestConvertScanToDomain_V1DataWithMapButInvalidBase64(t *testing.T) {
@@ -152,7 +152,7 @@ func TestConvertScanToDomain_V1DataWithMapButInvalidBase64(t *testing.T) {
 	result, err := ConvertScanToDomain(rawScan)
 
 	assert.Error(t, err)
-	assert.Equal(t, ScanResult{}, result)
+	assert.Equal(t, ServiceScan{}, result)
 }
 
 func TestConvertScanToDomain_EmptyData(t *testing.T) {
@@ -172,5 +172,5 @@ func TestConvertScanToDomain_EmptyData(t *testing.T) {
 	assert.Equal(t, uint32(8080), result.Port)
 	assert.Equal(t, "HTTP", result.Service)
 	assert.Equal(t, "", result.Response) // Empty response for nil data
-	assert.Equal(t, time.Unix(1640995200, 0), result.Timestamp)
+	assert.Equal(t, time.Unix(1640995200, 0), result.LastScanned)
 }
