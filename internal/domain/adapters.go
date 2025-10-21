@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"encoding/base64"
+	"encoding/json"
 	"time"
 
 	"github.com/censys/scan-takehome/pkg/scanning"
@@ -25,31 +25,36 @@ func ConvertScanToDomain(rawScan scanning.Scan) (ServiceScan, error) {
 func extractServiceResponse(rawScan scanning.Scan) (string, error) {
 	switch rawScan.DataVersion {
 	case scanning.V1:
-		switch data := rawScan.Data.(type) {
-		case *scanning.V1Data:
-			decoded, err := base64.StdEncoding.DecodeString(string(data.ResponseBytesUtf8))
-			if err != nil {
-				return "", err
-			}
-			return string(decoded), nil
-		case map[string]interface{}:
-			if responseBytes, ok := data["response_bytes_utf8"].(string); ok {
-				decoded, err := base64.StdEncoding.DecodeString(responseBytes)
-				if err != nil {
-					return "", err
-				}
-				return string(decoded), nil
-			}
+		// Try to unmarshal into V1Data struct
+		var v1Data scanning.V1Data
+		if err := unmarshalData(rawScan.Data, &v1Data); err != nil {
+			return "", err
 		}
+		// V1Data.ResponseBytesUtf8 is already decoded from base64 during JSON unmarshaling
+		return string(v1Data.ResponseBytesUtf8), nil
 	case scanning.V2:
-		switch data := rawScan.Data.(type) {
-		case *scanning.V2Data:
-			return data.ResponseStr, nil
-		case map[string]interface{}:
-			if responseStr, ok := data["response_str"].(string); ok {
-				return responseStr, nil
-			}
+		// Try to unmarshal into V2Data struct
+		var v2Data scanning.V2Data
+		if err := unmarshalData(rawScan.Data, &v2Data); err != nil {
+			return "", err
 		}
+		return v2Data.ResponseStr, nil
 	}
 	return "", nil
+}
+
+func unmarshalData(data, target interface{}) error {
+	if data == nil {
+		return nil
+	}
+
+	if dataMap, ok := data.(map[string]interface{}); ok {
+		jsonBytes, err := json.Marshal(dataMap)
+		if err != nil {
+			return err
+		}
+		return json.Unmarshal(jsonBytes, target)
+	}
+
+	return nil
 }
