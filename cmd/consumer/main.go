@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	_ "github.com/lib/pq"
 
@@ -15,16 +16,23 @@ import (
 func main() {
 	projectId := flag.String("project", "test-project", "GCP Project ID")
 	subscriptionId := flag.String("subscription", "scan-sub", "GCP PubSub Subscription ID")
-	dbHost := flag.String("db-host", "localhost", "Database host")
-	dbPort := flag.String("db-port", "5432", "Database port")
-	dbName := flag.String("db-name", "scans", "Database name")
-	dbUser := flag.String("db-user", "postgres", "Database user")
-	dbPassword := flag.String("db-password", "password", "Database password")
+	dbHost := flag.String("db-host", getEnv("DB_HOST", "localhost"), "Database host")
+	dbPort := flag.String("db-port", getEnv("DB_PORT", "5432"), "Database port")
+	dbName := flag.String("db-name", getEnv("DB_NAME", "scans"), "Database name")
+	dbUser := flag.String("db-user", getEnv("DB_USER", "postgres"), "Database user")
+	dbPassword := flag.String("db-password", getEnv("DB_PASSWORD", "postgres"), "Database password")
 	flag.Parse()
 
 	if err := run(*projectId, *subscriptionId, *dbHost, *dbPort, *dbName, *dbUser, *dbPassword); err != nil {
 		log.Fatalf("Application error: %v", err)
 	}
+}
+
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
 }
 
 func run(projectId, subscriptionId, dbHost, dbPort, dbName, dbUser, dbPassword string) error {

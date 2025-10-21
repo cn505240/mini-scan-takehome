@@ -55,6 +55,11 @@ services:
     environment:
       PUBSUB_EMULATOR_HOST: pubsub:8085
       PUBSUB_PROJECT_ID: test-project
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: scans
+      DB_USER: postgres
+      DB_PASSWORD: postgres
     build:
       context: .
       dockerfile: ./cmd/consumer/Dockerfile
